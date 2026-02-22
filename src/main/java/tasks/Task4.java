@@ -5,6 +5,7 @@ import common.Person;
 import common.PersonConverter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /*
 Задача 4
@@ -21,7 +22,15 @@ public class Task4 {
     this.personConverter = personConverter;
   }
 
+  /**
+   *Метод для получения списка, элементами которого являются
+   * ApiPersonDto, по списку с объектами типа Person
+   * @param persons - коллекция с объектами типа Person
+   * @return  список объектов типа ApiPersonDto
+   */
   public List<ApiPersonDto> convert(List<Person> persons) {
-    return new ArrayList<>();
+    return persons.stream()
+        .map(personConverter::convert)
+        .toList();
   }
 }

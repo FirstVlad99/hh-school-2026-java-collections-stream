@@ -6,6 +6,8 @@ import common.PersonConverter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /*
 Задача 5
@@ -22,7 +24,15 @@ public class Task5 {
     this.personConverter = personConverter;
   }
 
+  /**
+   *Метод для получения списка, элементами которого являются
+   * ApiPersonDto, по списку с объектами типа Person, с правильно проставленными areaId
+   * @param persons - коллекция с объектами типа Person
+   * @return  список объектов типа ApiPersonDto
+   */
   public List<ApiPersonDto> convert(List<Person> persons, Map<Integer, Integer> personAreaIds) {
-    return new ArrayList<>();
+    return persons.stream()
+        .map(person -> personConverter.convert(person, personAreaIds.get(person.id())))
+        .toList();
   }
 }
