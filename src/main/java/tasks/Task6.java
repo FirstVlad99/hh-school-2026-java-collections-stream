@@ -33,13 +33,9 @@ public class Task6 {
             Area::getName
         ));
     return persons.stream()
-        .flatMap( person -> {
-          Set<Integer> areasId = personAreaIds.get(person.id());
-          return areasId.stream()
+        .flatMap( person -> personAreaIds.get(person.id()).stream()
               .map(areasMap::get)
-              .map(areaName -> person.firstName() + " - " + areaName);
-          }
-        )
+              .map(areaName -> person.firstName() + " - " + areaName))
         .collect(Collectors.toSet());
 
 

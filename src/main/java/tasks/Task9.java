@@ -20,10 +20,8 @@ public class Task9 {
   // Костыль, эластик всегда выдает в топе "фальшивую персону".
   // Конвертируем начиная со второй
   public List<String> getNames(List<Person> persons) {
-    // isEmpty() более естественна
-    if (persons.isEmpty()) {
-      return Collections.emptyList();
-    }
+    // проверка isEmpty не нужна, потому что Stream API безопасно все обработает
+    // (раньше она была нужна из-за удаления первого элемента)
     // удаление элемента из списка заменил на skip одной "фальшивой персоны" (удаление из начала списка - O(n-1),
     // где n- количество элементов в списке)
     return persons.stream().skip(1).map(Person::firstName).collect(Collectors.toList());
@@ -48,18 +46,26 @@ public class Task9 {
   // словарь id персоны -> ее имя
   public Map<Integer, String> getPersonNames(Collection<Person> persons) {
     // использование StreamApi для обработки коллекций приоритетней
+    // обновил до версии с функцией мержа, чтобы код не упал при попытке
+    // добавить 2 элемента с одинаковым id
     return persons.stream()
         .collect(Collectors.toMap(
             Person::id,
-            Person::firstName
+            Person::firstName,
+            (oldId,newId) -> oldId
         ));
   }
 
   // есть ли совпадающие в двух коллекциях персоны?
   public boolean hasSamePersons(Collection<Person> persons1, Collection<Person> persons2) {
     // использование StreamApi для обработки коллекций приоритетней
+    // перевел одну коллекцию в Set (для проверки на вхождение)
+    // за счет чего с O(n*m), где n,m - количество элементов в 1, 2 коллекции соответственно
+    // ушел на O(n+m)
+
+    Set<Person> person2Set = new HashSet<>(persons2);
     return persons1.stream()
-        .anyMatch(persons2::contains);
+        .anyMatch(person2Set::contains);
   }
 
   // Посчитать число четных чисел
@@ -72,10 +78,12 @@ public class Task9 {
   // Пояснение в чем соль - мы перетасовали числа, обернули в HashSet, а toString() у него вернул их в сортированном порядке
   void listVsSet() {
     // под капотом HashSet есть HashMap с фиктивными значениями (ключ - элемент множества),
-    // скорее всего такое поведение связано с тем, что при хэшировании
-    // числа попадают в бакеты примерно с теми же индексами, что и сами числа,
-    // за счет чего при выводе числа появляются в отсортированном порядке,
-    // но разработчиками языка это не гарантируется
+    // я посмотрел в Integer.java : hashCode от Integer равен самому числу.
+    // при создании: new HashSet<>(integers), множество должно содержать элементы integers,
+    // емкость внутреннего backets должна быть как минимум равна длине integers,
+    // т.к. длина backets - равна степени двойки, то емкость в нашем случае будет равна 2^14,
+    // итого наши числа распределятся в ячейки backets с теми же индексами, что и сами числа,
+    // поэтому при выводе получим числа в отсортированном порядке
     List<Integer> integers = IntStream.rangeClosed(1, 10000).boxed().collect(Collectors.toList());
     List<Integer> snapshot = new ArrayList<>(integers);
     Collections.shuffle(integers);

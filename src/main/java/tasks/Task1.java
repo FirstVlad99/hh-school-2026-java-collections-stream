@@ -32,19 +32,17 @@ public class Task1 {
    * @return список объектов типа Person
    */
   public List<Person> findOrderedPersons(List<Integer> personIds) {
-    Set<Person> persons = personService.findPersons(personIds);
-
     // Создаю отображение ID - Person
     // Для дальнейшего получения за O(1) из Map объекта типа Person
     // и составления итогового списка на основе входящего (с учетом возможных повторений)
+    Map<Integer,Person> persons = personService.findPersons(personIds).stream()
+        .collect(Collectors.toMap(
+            Person::id,
+            person -> person
+        ));;
 
-    Map<Integer,Person> personMap = persons.stream()
-            .collect(Collectors.toMap(
-                    Person::id,
-                    person -> person
-            ));
       return personIds.stream()
-              .map(personMap::get)
+              .map(persons::get)
               .toList();
 
   }

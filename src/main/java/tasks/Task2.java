@@ -30,8 +30,7 @@ public class Task2 {
   public static List<Person> combineAndSortWithLimit(Collection<Person> persons1,
                                                      Collection<Person> persons2,
                                                      int limit) {
-    return Stream.of(persons1,persons2)
-        .flatMap(Collection::stream)
+    return Stream.concat(persons1.stream(),persons2.stream())
         .sorted(Comparator.comparing(Person::createdAt))
         .limit(limit)
         .toList();
